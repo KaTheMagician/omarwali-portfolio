@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Omarwali Jones — Creative Technologist</title>
+  <meta name="description" content="Portfolio of Omarwali Jones — Creative Technologist, AI Interaction Engineer, Sound Visual Architect." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#05070b; --panel:#0a0f14; --ink:#eaf6ff; --muted:#8fb4cc;
+      --primary:#2dd4ff; --ring:#2dd4ff33; --accent:#ff36c9; --line:#123042;
+      --glow:0 0 12px #2dd4ff88, 0 0 36px #2dd4ff44;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:radial-gradient(1200px 600px at 50% -10%, #061018, transparent 60%), var(--bg); color:var(--ink); font:15px/1.6 Inter, system-ui, Segoe UI, Roboto, Arial; scroll-behavior:smooth}
+    a{color:var(--primary); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Canvas background */
+    #bgCanvas{position:fixed; inset:0; width:100vw; height:100vh; display:block; z-index:0}
+
+    /* Top nav */
+    header{position:sticky; top:0; z-index:10; backdrop-filter:blur(8px); background:linear-gradient(#061018cc,#06101800); border-bottom:1px solid #0b2635}
+    .nav{max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:14px 18px}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.3px}
+    .brand .dot{width:10px; height:10px; border-radius:50%; background:var(--primary); box-shadow:var(--glow)}
+    .nav a{margin-left:16px; font-weight:600; position:relative}
+    .nav a.active::after{content:""; position:absolute; left:0; right:0; bottom:-8px; height:2px; background:var(--primary); box-shadow:var(--glow)}
+
+    /* Sections */
+    .wrap{position:relative; z-index:1}
+    section{max-width:1100px; margin:0 auto; padding:72px 18px}
+    h1,h2,h3{margin:0 0 10px}
+    h1{font-size:40px; line-height:1.1}
+    h2{font-size:22px; color:var(--primary)}
+    .lede{color:#cfe8ff; font-size:18px; margin-top:8px}
+
+    /* Hero */
+    .hero{display:grid; grid-template-columns:1.1fr .9fr; gap:28px; align-items:center; padding-top:46px}
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--line); border-radius:999px; background:linear-gradient(180deg,#0b1a24,#08131b); color:#cdefff; font-weight:700; letter-spacing:.2px}
+    .buttons{display:grid; grid-template-columns:repeat(2, minmax(200px, 1fr)); gap:12px; margin-top:18px}
+    .btn{appearance:none; border:none; background:#0d1b24; color:var(--ink); padding:12px 14px; border-radius:14px; font-weight:800; cursor:pointer; box-shadow:0 6px 26px rgba(0,0,0,.35); border:1px solid var(--line); text-align:center}
+    .btn:hover{background:#112433}
+    .btn.primary{background:linear-gradient(180deg,#082633,#0d1b24); outline:2px solid #124a60; box-shadow:var(--glow)}
+    .btn.ghost{background:transparent; border:1px solid var(--line)}
+
+    /* Cards */
+    .grid{display:grid; grid-template-columns:repeat(12,1fr); gap:16px}
+    .card{grid-column:span 12; background:linear-gradient(180deg,#0b1218, #080c12); border:1px solid var(--line); border-radius:18px; padding:16px 18px; box-shadow:0 10px 36px rgba(0,0,0,.45)}
+    .card h3{color:#dff6ff; font-size:16px; letter-spacing:.2px; margin-bottom:8px}
+    .card p{margin:6px 0}
+    .list{margin:8px 0 0 16px}
+    .list li{margin:6px 0}
+
+    /* Two-up */
+    .two{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+
+    /* Footer */
+    footer{border-top:1px solid #0b2635; background:linear-gradient(0deg,#061018cc,#06101800); color:#a8c6da}
+
+    /* Mic status dot */
+    #statusDot{position:fixed; right:14px; bottom:14px; width:12px; height:12px; border-radius:999px; background:#00ff9d; box-shadow:0 0 10px #00ff9d, 0 0 16px #00ff9d66; opacity:0; transform:scale(.85); transition:opacity .6s ease, transform .6s ease; mix-blend-mode:screen; z-index:9}
+
+    /* Reveal animations */
+    .reveal{opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s ease}
+    .reveal.show{opacity:1; transform:translateY(0)}
+
+    /* Modal */
+    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.6); z-index:20}
+    .modal.open{display:grid}
+    .modal .panel{width:min(920px,92vw); background:#0b1218; border:1px solid var(--line); border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,.6); padding:12px}
+    .modal header{position:relative; background:transparent; border:0; backdrop-filter:none}
+    .modal .close{position:absolute; right:10px; top:10px}
+
+    /* Resume preview */
+    .embedWrap{aspect-ratio: 8.5/11; width:100%; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#0a0f14}
+    .embedWrap iframe{width:100%; height:100%; border:0}
+
+    @media (max-width:900px){
+      .hero{grid-template-columns:1fr; padding-top:18px}
+      h1{font-size:32px}
+      .two{grid-template-columns:1fr}
+      .buttons{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+  <header>
+    <nav class="nav">
+      <div class="brand"><span class="dot"></span> <span>Omarwali Jones</span></div>
+      <div>
+        <a href="#about" data-section="about">About</a>
+        <a href="#project" data-section="project">Amoeba/Dragon</a>
+        <a href="#ai" data-section="ai">AI Collaboration</a>
+        <a href="#skills" data-section="skills">Skills</a>
+        <a href="#resume" data-section="resume">Résumé</a>
+        <a href="#contact" data-section="contact">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <section class="hero reveal" id="top">
+      <div>
+        <div class="badge">Creative Technologist · AI Interaction Engineer · Sound Visual Architect</div>
+        <h1>Designing interfaces that <span style="color:var(--primary)">listen</span>, adapt, and evolve.</h1>
+        <p class="lede">I build real‑time, audio‑reactive systems and neon‑minimal interfaces. My flagship project, <b>Amoeba/Dragon</b>, translates sound into living light — a hybrid of engineering and art.</p>
+        <div class="buttons">
+          <a class="btn primary" href="Omarwali_Jones_AmoebaDragon_Resume_v5_Final.pdf" download>⬇️ Download PDF Résumé</a>
+          <a class="btn ghost" href="#contact" id="contactScroll">📧 Contact Me</a>
+          <button class="btn" id="micBtn">🎤 Enable Subtle Mic Background</button>
+          <button class="btn" id="demoBtn">▶️ Open Live Demo Modal</button>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h3>Signature Build — Amoeba/Dragon v3.5.2</h3>
+          <p>Real‑mic echo memory · Neon mic‑health indicator · 8 environmental presets · 32‑band spectral engine · Low‑latency node‑link visuals</p>
+          <p style="color:var(--muted); font-family:JetBrains Mono, monospace">JavaScript · HTML5 Canvas · Web Audio API · AI‑assisted iteration</p>
+        </div>
+        <div class="card">
+          <h3>Live Demo (Optional)</h3>
+          <p>For security and comfort, the mic‑reactive background is off by default. Click “Enable Subtle Mic Background” to activate — a minimal, resource‑light effect inspired by the main project. Use the modal to showcase a focused preview.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="reveal">
+      <h2>About · Mission</h2>
+      <div class="grid">
+        <div class="card">
+          <p>I’m a self‑taught developer and creative technologist working where sound, motion, and machine intelligence intersect. I treat LLMs as co‑developers — using structured dialogue to iterate architecture, UI, and acoustic behavior. I build systems that feel <i>alive</i>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="project" class="reveal">
+      <h2>Amoeba/Dragon — Project Highlights</h2>
+      <div class="grid">
+        <div class="card two">
+          <div>
+            <h3>Core Systems</h3>
+            <ul class="list">
+              <li>Real‑mic echo memory (3s rolling FFT) with spectral “ghost” cooling.</li>
+              <li>Neon mic‑health indicator (foreground off · background on) for live status.</li>
+              <li>32‑band spectral engine + 200+ node‑link simulation tuned for fluidity.</li>
+              <li>8 environmental presets with custom EQ/compressor dynamics.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Controls · UX</h3>
+            <ul class="list">
+              <li>Environment sensitivity, low‑frequency boost, transient sharpness, echo fade.</li>
+              <li>High‑DPI scaling and performance‑aware animation pacing.</li>
+              <li>Mobile‑first layout with neon‑minimal theme.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ai" class="reveal">
+      <h2>AI Collaboration · Prompt Engineering</h2>
+      <div class="grid">
+        <div class="card">
+          <p>Each version was co‑created with ChatGPT and Claude — refining architecture, aesthetics, and acoustic response. This sharpened my ability to translate intent into precise prompts, stabilize outputs, and synthesize design + engineering decisions quickly.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="reveal">
+      <h2>Technical · Creative Skills</h2>
+      <div class="grid">
+        <div class="card two">
+          <div>
+            <h3>Languages · Tools</h3>
+            <p>JavaScript, HTML5, CSS3, PowerShell, Node.js, Git, VS Code</p>
+            <h3>Core Strengths</h3>
+            <p>Audio‑reactive systems, generative design, UI/UX for interactive media, performance optimization, creative automation</p>
+          </div>
+          <div>
+            <h3>AI · Collaboration</h3>
+            <p>Prompt design, iterative prototyping with LLMs, AI‑assisted debugging, conceptual synthesis</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="resume" class="reveal">
+      <h2>Résumé Preview</h2>
+      <div class="grid">
+        <div class="card">
+          <p>Inline preview of your latest PDF. Use the download button for the high‑res version.</p>
+          <div class="embedWrap">
+            <iframe title="Resume" src="Omarwali_Jones_AmoebaDragon_Resume_v5_Final.pdf"></iframe>
+          </div>
+          <div class="buttons" style="margin-top:12px; grid-template-columns:1fr;">
+            <a class="btn primary" href="Omarwali_Jones_AmoebaDragon_Resume_v5_Final.pdf" download>⬇️ Download PDF Résumé</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="reveal">
+      <h2>Vision · Contact</h2>
+      <div class="grid">
+        <div class="card">
+          <p>I’m exploring roles where creative intuition meets systems thinking — shaping interfaces, tools, and experiences that listen and evolve.</p>
+          <p><b>Location:</b> Jamaica, NY</p>
+          <p><b>Links:</b> <a href="https://github.com/KaTheMagician" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/omarwalijones" target="_blank" rel="noopener">LinkedIn</a></p>
+          <div class="buttons" style="margin-top:10px; grid-template-columns:1fr; max-width:320px;">
+            <a class="btn primary" href="mailto:omarwalijones@gmail.com">Send Email</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <section style="max-width:1100px; margin:0 auto; padding:24px 18px; display:flex; justify-content:space-between; align-items:center">
+      <div>© <span id="year"></span> Omarwali Jones</div>
+      <div style="opacity:.8">Built with HTML · CSS · JS · Web Audio API</div>
+    </section>
+  </footer>
+
+  <!-- Demo Modal -->
+  <div id="demoModal" class="modal" aria-hidden="true">
+    <div class="panel">
+      <header class="nav" style="padding:8px 10px">
+        <div style="font-weight:800">Amoeba/Dragon — Live Preview</div>
+        <button class="btn close" id="closeDemo">✕ Close</button>
+      </header>
+      <div style="padding:10px">
+        <!-- Replace the src below with a hosted demo URL or local file path when deployed -->
+        <iframe title="Amoeba Demo" srcdoc="<html><body style='margin:0;background:#000;color:#fff;font-family:sans-serif;display:grid;place-items:center;height:100vh'><p>Embed your demo here (replace srcdoc/src with your hosted Amoeba/Dragon build).</p></body></html>" style="width:100%;height:min(70vh,720px);border:0"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div id="statusDot" aria-hidden="true"></div>
+
+  <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // IntersectionObserver reveals
+    const io = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('show'); });
+    }, {threshold:0.12});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+    // Active nav link on scroll
+    const sections = [...document.querySelectorAll('section[id]')];
+    const navLinks = [...document.querySelectorAll('nav a[data-section]')];
+    const spy = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          const id = e.target.id;
+          navLinks.forEach(a=>a.classList.toggle('active', a.dataset.section===id));
+        }
+      });
+    }, {rootMargin:'-45% 0px -45% 0px', threshold:0});
+    sections.forEach(s=>spy.observe(s));
+
+    // Background canvas: subtle neon particles with mic option + parallax
+    const canvas = document.getElementById('bgCanvas');
+    const c = canvas.getContext('2d', {alpha:true});
+    let W=0, H=0, DPR=1; let nodes=[]; let analyser=null, dataArr=null, audioCtx=null, micSource=null;
+    let parallax = {x:0, y:0};
+
+    function resize(){
+      DPR = Math.min(2, window.devicePixelRatio||1);
+      W = canvas.width = Math.floor(innerWidth * DPR);
+      H = canvas.height = Math.floor(innerHeight * DPR);
+      canvas.style.width = innerWidth+'px';
+      canvas.style.height = innerHeight+'px';
+      makeNodes();
+    }
+    addEventListener('resize', resize, {passive:true});
+
+    function makeNodes(){
+      const count = Math.max(140, Math.floor(Math.min(W,H)/5));
+      nodes = Array.from({length:count}, ()=>({
+        x: Math.random()*W, y: Math.random()*H,
+        vx:(Math.random()-.5)*0.22, vy:(Math.random()-.5)*0.22,
+        z: Math.random()*1,
+      }));
+    }
+
+    let micEnergy = 0; // 0..1
+    async function enableMic(){
+      if (audioCtx) { if(audioCtx.state==='suspended') await audioCtx.resume(); return; }
+      audioCtx = new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});
+      const stream = await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:false, noiseSuppression:false, autoGainControl:false } });
+      micSource = audioCtx.createMediaStreamSource(stream);
+      analyser = audioCtx.createAnalyser(); analyser.fftSize = 1024;
+      micSource.connect(analyser);
+      dataArr = new Uint8Array(analyser.frequencyBinCount);
+      document.getElementById('statusDot').style.opacity = '1';
+    }
+
+    function animate(){
+      requestAnimationFrame(animate);
+      if(!W||!H) return;
+      c.clearRect(0,0,W,H);
+
+      // mic energy estimate
+      if(analyser && dataArr){
+        analyser.getByteFrequencyData(dataArr);
+        let sum=0; for(let i=0;i<dataArr.length;i++) sum+=dataArr[i];
+        const avg = sum / (dataArr.length*255);
+        micEnergy += (avg - micEnergy) * 0.08; // ease
+      } else {
+        micEnergy += (0.02 - micEnergy) * 0.02; // idle
+      }
+
+      // draw particles
+      const offsetX = parallax.x * 10 * DPR;
+      const offsetY = parallax.y * 10 * DPR;
+      for(const n of nodes){
+        const speed = 0.35 + micEnergy*1.5; // subtle speed up
+        n.x += n.vx * speed; n.y += n.vy * speed;
+        if(n.x<0||n.x>W) n.vx*=-1; if(n.y<0||n.y>H) n.vy*=-1;
+        const r = (1.1 + n.z*1.7) * DPR + micEnergy*0.7*DPR;
+        const alpha = 0.18 + micEnergy*0.24 + n.z*0.22;
+        c.beginPath();
+        const blue = 120 + Math.floor(micEnergy*80);
+        c.fillStyle = `rgba(${20+blue/6}, ${120+blue/3}, ${210+micEnergy*45}, ${alpha})`;
+        c.arc(n.x + (n.z-0.5)*offsetX, n.y + (n.z-0.5)*offsetY, r, 0, Math.PI*2); c.fill();
+      }
+
+      // gentle vignette
+      const grad = c.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.min(W,H)*0.7);
+      grad.addColorStop(0,'rgba(0,0,0,0)'); grad.addColorStop(1,'rgba(0,0,0,0.35)');
+      c.fillStyle = grad; c.fillRect(0,0,W,H);
+
+      // status dot: green when active
+      const dot = document.getElementById('statusDot');
+      if(analyser){ dot.style.opacity = '1'; dot.style.transform = 'scale(1)'; }
+      else { dot.style.opacity = '0'; }
+    }
+
+    // Parallax mouse
+    window.addEventListener('mousemove', e=>{
+      const x = (e.clientX / innerWidth) * 2 - 1;
+      const y = (e.clientY / innerHeight) * 2 - 1;
+      parallax.x += (x - parallax.x) * 0.06;
+      parallax.y += (y - parallax.y) * 0.06;
+    }, {passive:true});
+
+    // Kick
+    resize(); animate();
+
+    // UI: mic button
+    document.getElementById('micBtn').addEventListener('click', async () => {
+      try { await enableMic(); } catch (e) { alert('Microphone permission is needed to enable the subtle background.'); }
+    });
+
+    // Demo modal controls
+    const demo = document.getElementById('demoModal');
+    document.getElementById('demoBtn').addEventListener('click', ()=> demo.classList.add('open'));
+    document.getElementById('closeDemo').addEventListener('click', ()=> demo.classList.remove('open'));
+    demo.addEventListener('click', (e)=>{ if(e.target===demo) demo.classList.remove('open'); });
+  </script>
+</body>
+</html>
