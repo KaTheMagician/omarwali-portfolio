@@ -46,10 +46,8 @@ start index.html   # (Windows)
 open index.html    # (macOS)
 
 ---
-
 ### 💾 Download README
 Need an offline copy?  
 [⬇️ **Download this README as a file**](https://raw.githubusercontent.com/KaTheMagician/omarwali-portfolio/main/README.md)
-
 ---
 
